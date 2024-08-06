@@ -5,18 +5,19 @@ import { logger } from './util'
 config()
 
 export class InterfaceClass {
-    private readonly domainName: string;
     private session: AxiosInstance;
 
     private tokenUb: string | undefined;
 
     constructor(domainName?: string) {
-        this.domainName = domainName || 'http://8.147.116.35:30020'
-        this.session = axios.create()
+        this.session = axios.create({
+            baseURL: domainName || 'http://8.147.116.35:30020',
+            timeout: 5000
+        })
     }
 
     private async sendLogin(username: string, password: string) {
-        const url = `${this.domainName}/Login`;
+        const url = `/Login`;
         const data = {
             user: username,
             password: password
@@ -40,7 +41,7 @@ export class InterfaceClass {
     }
 
     async sendGetGameInfo() {
-        const url = `${this.domainName}/TradeAPI/GetGameInfo`;
+        const url = `/TradeAPI/GetGameInfo`;
         const data = {
             token_ub: await this.getTokenUb(),
         };
@@ -50,7 +51,7 @@ export class InterfaceClass {
 
     async sendOrder(instrument: string, localtime: number, direction: string, price: number, volume: number) {
         logger.debug(`Order: Instrument: ${instrument}, Direction: ${direction}, Price: ${price}, Volume: ${volume}`);
-        const url = `${this.domainName}/TradeAPI/Order`;
+        const url = `/TradeAPI/Order`;
         const data = {
             token_ub: await this.getTokenUb(),
             user_info: "NULL",
@@ -66,7 +67,7 @@ export class InterfaceClass {
 
     async sendCancel(instrument: string, localtime: number, index: number) {
         logger.debug(`Cancel: Instrument: ${instrument}, index: ${index}`);
-        const url = `${this.domainName}/TradeAPI/Cancel`;
+        const url = `/TradeAPI/Cancel`;
         const data = {
             token_ub: await this.getTokenUb(),
             user_info: "NULL",
@@ -79,7 +80,7 @@ export class InterfaceClass {
     }
 
     async sendGetLimitOrderBook(instrument: string) {
-        const url = `${this.domainName}/TradeAPI/GetLimitOrderBook`;
+        const url = `/TradeAPI/GetLimitOrderBook`;
         const data = {
             token_ub: await this.getTokenUb(),
             instrument: instrument
@@ -89,7 +90,7 @@ export class InterfaceClass {
     }
 
     async sendGetUserInfo() {
-        const url = `${this.domainName}/TradeAPI/GetUserInfo`;
+        const url = `/TradeAPI/GetUserInfo`;
         const data = {
             token_ub: await this.getTokenUb(),
         };
@@ -98,7 +99,7 @@ export class InterfaceClass {
     }
 
     async sendGetInstrumentInfo() {
-        const url = `${this.domainName}/TradeAPI/GetInstrumentInfo`;
+        const url = `/TradeAPI/GetInstrumentInfo`;
         const data = {
             token_ub: await this.getTokenUb(),
         };
@@ -107,7 +108,7 @@ export class InterfaceClass {
     }
 
     async sendGetTrade(instrument: string) {
-        const url = `${this.domainName}/TradeAPI/GetTrade`;
+        const url = `/TradeAPI/GetTrade`;
         const data = {
             token_ub: await this.getTokenUb(),
             instrument_name: instrument
@@ -117,7 +118,7 @@ export class InterfaceClass {
     }
 
     async sendGetActiveOrder() {
-        const url = `${this.domainName}/TradeAPI/GetActiveOrder`;
+        const url = `/TradeAPI/GetActiveOrder`;
         const data = {
             token_ub: await this.getTokenUb(),
         };
