@@ -1,43 +1,61 @@
 import axios, { AxiosInstance } from 'axios';
 import * as log4js from 'log4js';
+import { config } from 'dotenv';
+import assert from 'node:assert';
 
 const logger = log4js.getLogger();
 logger.level = 'debug';
+config()
 
 export class InterfaceClass {
-    private domainName: string;
+    private readonly domainName: string;
     private session: AxiosInstance;
 
-    constructor(domainName: string) {
-        this.domainName = domainName;
-        this.session = axios.create();
+    private tokenUb: string | undefined;
+
+    constructor(domainName?: string) {
+        this.domainName = domainName || 'http://8.147.116.35:30020'
+        this.session = axios.create()
     }
 
-    async sendLogin(username: string, password: string) {
+    private async sendLogin(username: string, password: string) {
         const url = `${this.domainName}/Login`;
         const data = {
             user: username,
             password: password
         };
         const response = await this.session.post(url, data);
+        if (response.data.status == 'Success') {
+            this.tokenUb = response.data.token_ub;
+        } else {
+            throw new Error(`Error when login: ${response.status}, ${response.data}`)
+        }
         return response.data;
     }
 
-    async sendGetGameInfo(tokenUb: string) {
-        logger.debug('GetGameInfo: ');
+    private async getTokenUb(): Promise<string> {
+        if (!this.tokenUb) {
+            const username = process.env.USER_NAME!
+            const password = process.env.PASS_WORD!
+            await this.sendLogin(username, password);
+        }
+        return this.tokenUb!
+    }
+
+    async sendGetGameInfo() {
         const url = `${this.domainName}/TradeAPI/GetGameInfo`;
         const data = {
-            token_ub: tokenUb,
+            token_ub: await this.getTokenUb(),
         };
         const response = await this.session.post(url, data);
         return response.data;
     }
 
-    async sendOrder(tokenUb: string, instrument: string, localtime: number, direction: string, price: number, volume: number) {
+    async sendOrder(instrument: string, localtime: number, direction: string, price: number, volume: number) {
         logger.debug(`Order: Instrument: ${instrument}, Direction: ${direction}, Price: ${price}, Volume: ${volume}`);
         const url = `${this.domainName}/TradeAPI/Order`;
         const data = {
-            token_ub: tokenUb,
+            token_ub: await this.getTokenUb(),
             user_info: "NULL",
             instrument: instrument,
             localtime: localtime,
@@ -49,11 +67,11 @@ export class InterfaceClass {
         return response.data;
     }
 
-    async sendCancel(tokenUb: string, instrument: string, localtime: number, index: number) {
+    async sendCancel(instrument: string, localtime: number, index: number) {
         logger.debug(`Cancel: Instrument: ${instrument}, index: ${index}`);
         const url = `${this.domainName}/TradeAPI/Cancel`;
         const data = {
-            token_ub: tokenUb,
+            token_ub: await this.getTokenUb(),
             user_info: "NULL",
             instrument: instrument,
             localtime: 0,
@@ -63,53 +81,48 @@ export class InterfaceClass {
         return response.data;
     }
 
-    async sendGetLimitOrderBook(tokenUb: string, instrument: string) {
-        logger.debug(`GetLimitOrderBook: Instrument: ${instrument}`);
+    async sendGetLimitOrderBook(instrument: string) {
         const url = `${this.domainName}/TradeAPI/GetLimitOrderBook`;
         const data = {
-            token_ub: tokenUb,
+            token_ub: await this.getTokenUb(),
             instrument: instrument
         };
         const response = await this.session.post(url, data);
         return response.data;
     }
 
-    async sendGetUserInfo(tokenUb: string) {
-        logger.debug('GetUserInfo: ');
+    async sendGetUserInfo() {
         const url = `${this.domainName}/TradeAPI/GetUserInfo`;
         const data = {
-            token_ub: tokenUb,
+            token_ub: await this.getTokenUb(),
         };
         const response = await this.session.post(url, data);
         return response.data;
     }
 
-    async sendGetInstrumentInfo(tokenUb: string) {
-        logger.debug('GetInstrumentInfo: ');
+    async sendGetInstrumentInfo() {
         const url = `${this.domainName}/TradeAPI/GetInstrumentInfo`;
         const data = {
-            token_ub: tokenUb,
+            token_ub: await this.getTokenUb(),
         };
         const response = await this.session.post(url, data);
         return response.data;
     }
 
-    async sendGetTrade(tokenUb: string, instrument: string) {
-        logger.debug(`GetTrade: Instrument: ${instrument}`);
+    async sendGetTrade(instrument: string) {
         const url = `${this.domainName}/TradeAPI/GetTrade`;
         const data = {
-            token_ub: tokenUb,
+            token_ub: await this.getTokenUb(),
             instrument_name: instrument
         };
         const response = await this.session.post(url, data);
         return response.data;
     }
 
-    async sendGetActiveOrder(tokenUb: string) {
-        logger.debug('GetActiveOrder: ');
+    async sendGetActiveOrder() {
         const url = `${this.domainName}/TradeAPI/GetActiveOrder`;
         const data = {
-            token_ub: tokenUb,
+            token_ub: await this.getTokenUb(),
         };
         const response = await this.session.post(url, data);
         return response.data;
