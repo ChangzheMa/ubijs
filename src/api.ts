@@ -1,10 +1,7 @@
-import axios, { AxiosInstance } from 'axios';
-import * as log4js from 'log4js';
-import { config } from 'dotenv';
-import assert from 'node:assert';
+import axios, { AxiosInstance } from 'axios'
+import { config } from 'dotenv'
+import { logger } from './util'
 
-const logger = log4js.getLogger();
-logger.level = 'debug';
 config()
 
 export class InterfaceClass {
