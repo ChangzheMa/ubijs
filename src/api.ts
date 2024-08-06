@@ -26,7 +26,7 @@ export class InterfaceClass {
         if (response.data.status == 'Success') {
             this.tokenUb = response.data.token_ub;
         } else {
-            throw new Error(`Error when login: ${response.status}, ${response.data}`)
+            throw new Error(`Error when login: ${response.status}, ${JSON.stringify(response.data)}`)
         }
         return response.data;
     }
