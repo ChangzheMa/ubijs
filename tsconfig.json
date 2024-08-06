@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es6",                        /* 编译的目标JavaScript版本 */
+    "module": "commonjs",                   /* 使用的模块系统 */
+    "outDir": "./dist",                     /* 输出目录 */
+    "strict": true,                         /* 启用所有严格的类型检查选项 */
+    "esModuleInterop": true,                /* 启用与CommonJS和AMD模块的互操作性 */
+    "forceConsistentCasingInFileNames": true,  /* 强制文件名大小写一致性 */
+    "skipLibCheck": true                    /* 跳过库文件的类型检查以加速编译 */
+  },
+  "include": ["src/**/*"],                 /* 包含在编译中的文件 */
+  "exclude": ["node_modules", "**/*.spec.ts"] /* 排除文件 */
+}
