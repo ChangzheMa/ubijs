@@ -5,15 +5,19 @@ const api = new InterfaceClass()
 
 const fetchDataByInstrumentName = async (instrumentName: string) => {
     const logPath = `${process.env.LOG_FOLDER}/${instrumentName}.log`
-    const errLogPath = `${process.env.LOG_FOLDER}/${instrumentName}.error.log`
+    const errPath = `${process.env.LOG_FOLDER}/${instrumentName}.error.log`
+    const invalidPath = `${process.env.LOG_FOLDER}/${instrumentName}.invalid.log`
     while (true) {
         try {
-            const lobResponse = await api.sendGetLimitOrderBook(instrumentName)
-            if (lobResponse.status == 'Success') {
-                appendToFile(logPath, `${new Date().toISOString()} || ${JSON.stringify(lobResponse)}`).then()
-            } else {
-                appendToFile(errLogPath, `${new Date().toISOString()} || ${JSON.stringify(lobResponse)}`).then()
-            }
+            api.sendGetLimitOrderBook(instrumentName).then((lobResponse: any) => {
+                if (lobResponse.status == 'Success') {
+                    appendToFile(logPath, `${new Date().toISOString()} || ${JSON.stringify(lobResponse)}`).then()
+                } else if (lobResponse.status != 'Invalid Time' && lobResponse.status != 'No Game') {
+                    appendToFile(errPath, `${new Date().toISOString()} || ${JSON.stringify(lobResponse)}`).then()
+                } else {
+                    appendToFile(invalidPath, `${new Date().toISOString()} || ${JSON.stringify(lobResponse)}`).then()
+                }
+            })
         } catch (error) {
             logger.warn(`Error when fetch data for ${instrumentName}, e: ${error}`)
         }
