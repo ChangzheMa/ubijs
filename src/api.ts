@@ -88,7 +88,7 @@ export class InterfaceClass {
             };
             const response = await this.session.post(url, data);
             return response.data;
-        } catch (e) {
+        } catch (e: Error) {
             logger.error(`Error when sendGetLimitOrderBook, instrument: ${instrument}, ${e.message}`)
         }
     }
