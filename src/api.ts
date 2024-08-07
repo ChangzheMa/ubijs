@@ -80,13 +80,17 @@ export class InterfaceClass {
     }
 
     async sendGetLimitOrderBook(instrument: string) {
-        const url = `/TradeAPI/GetLimitOrderBook`;
-        const data = {
-            token_ub: await this.getTokenUb(),
-            instrument: instrument
-        };
-        const response = await this.session.post(url, data);
-        return response.data;
+        try {
+            const url = `/TradeAPI/GetLimitOrderBook`;
+            const data = {
+                token_ub: await this.getTokenUb(),
+                instrument: instrument
+            };
+            const response = await this.session.post(url, data);
+            return response.data;
+        } catch (e) {
+            logger.error(`Error when sendGetLimitOrderBook, instrument: ${instrument}, ${e.message}`)
+        }
     }
 
     async sendGetUserInfo() {
