@@ -30,7 +30,7 @@ const fetchDataByInstrumentName = async (instrumentName: string) => {
         } catch (error) {
             logger.warn(`Error when fetch data for ${instrumentName}, e: ${error}`)
         }
-        await sleep(1000)
+        await sleep(Number(process.env.LOB_REQUEST_DELAY_MS) || 1000)
     }
 }
 
