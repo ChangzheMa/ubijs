@@ -4,14 +4,23 @@ import { sleep, logger, appendToFile } from './util';
 const api = new InterfaceClass()
 
 const fetchDataByInstrumentName = async (instrumentName: string) => {
-    const logPath = `${process.env.LOG_FOLDER}/${instrumentName}.log`
-    const errPath = `${process.env.LOG_FOLDER}/${instrumentName}.error.log`
-    const invalidPath = `${process.env.LOG_FOLDER}/${instrumentName}.invalid.log`
+    const baseFolder = `${process.env.CSV_LOG_FOLDER}`
+    const logPath = `${baseFolder}/${instrumentName}.csv`
+    const errPath = `${baseFolder}/${instrumentName}.error.log`
+    const invalidPath = `${baseFolder}/${instrumentName}.invalid.log`
+
+    let pre_localtime = -1
     while (true) {
         try {
             api.sendGetLimitOrderBook(instrumentName).then((lobResponse: any) => {
                 if (lobResponse.status == 'Success') {
-                    appendToFile(logPath, `${new Date().toISOString()} || ${JSON.stringify(lobResponse)}`).then()
+                    const lob = lobResponse.lob
+                    if (lob.localtime != pre_localtime) {
+                        pre_localtime = lob.localtime
+                        const dataStr = `${lob.localtime}|${lob.askprice.join('|')}|${lob.askvolume.join('|')}|`
+                            + `${lob.bidprice.join('|')}|${lob.bidvolume.join('|')}|${lob.trade_volume}|${lob.trade_value}`
+                        appendToFile(logPath, `${dataStr}`).then()
+                    }
                 } else if (lobResponse.status != 'Invalid Time' && lobResponse.status != 'No Game') {
                     appendToFile(errPath, `${new Date().toISOString()} || ${JSON.stringify(lobResponse)}`).then()
                 } else {
