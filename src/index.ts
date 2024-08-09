@@ -6,14 +6,21 @@ const api = new InterfaceClass()
 const fetchDataByInstrumentName = async (instrumentName: string) => {
     const baseFolder = `${process.env.CSV_LOG_FOLDER}`
     const logPath = `${baseFolder}/${instrumentName}.csv`
-    const errPath = `${baseFolder}/${instrumentName}.error.log`
-    const invalidPath = `${baseFolder}/${instrumentName}.invalid.log`
+    // const errPath = `${baseFolder}/${instrumentName}.error.log`
+    // const invalidPath = `${baseFolder}/${instrumentName}.invalid.log`
 
     let pre_localtime = -1
     while (true) {
         try {
             api.sendGetLimitOrderBook(instrumentName).then((lobResponse: any) => {
-                if (lobResponse.status == 'Success') {
+                if (typeof lobResponse == 'string') {
+                    try {
+                        lobResponse = JSON.parse(lobResponse.replace('-nan', '0'))
+                    } catch (e) {
+                        // do nothing
+                    }
+                }
+                if (lobResponse && lobResponse.status == 'Success') {
                     const lob = lobResponse.lob
                     if (lob.localtime != pre_localtime) {
                         pre_localtime = lob.localtime
@@ -21,10 +28,8 @@ const fetchDataByInstrumentName = async (instrumentName: string) => {
                             + `${lob.bidprice.join('|')}|${lob.bidvolume.join('|')}|${lob.trade_volume}|${lob.trade_value}`
                         appendToFile(logPath, `${dataStr}`).then()
                     }
-                } else if (lobResponse.status != 'Invalid Time' && lobResponse.status != 'No Game') {
-                    appendToFile(errPath, `${new Date().toISOString()} || ${JSON.stringify(lobResponse)}`).then()
-                } else {
-                    appendToFile(invalidPath, `${new Date().toISOString()} || ${JSON.stringify(lobResponse)}`).then()
+                } else if (!lobResponse || (lobResponse.status != 'Invalid Time' && lobResponse.status != 'No Game')) {
+                    logger.debug(`${new Date().toISOString()} || ${JSON.stringify(lobResponse)}`)
                 }
             })
         } catch (error) {
