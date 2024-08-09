@@ -47,7 +47,7 @@ const main = async () => {
 
         // 2. 获取股票信息
         const instrumentInfoResponse = await api.sendGetInstrumentInfo();
-        if (instrumentInfoResponse.status === 'Success') {
+        if (instrumentInfoResponse.status === 'Success' && instrumentInfoResponse.instruments) {
             const instrumentNames = instrumentInfoResponse.instruments.map((item: any) => {
                 return item.instrument_name
             })

@@ -1,6 +1,21 @@
 import axios, { AxiosInstance } from 'axios'
 import { config } from 'dotenv'
 import { logger } from './util'
+import {
+    CancelRequest,
+    CancelResponse,
+    GetActiveOrderRequest,
+    GetActiveOrderResponse,
+    GetGameInfoRequest,
+    GetGameInfoResponse, GetInstrumentInfoRequest, GetInstrumentInfoResponse,
+    GetLimitOrderBookRequest,
+    GetLimitOrderBookResponse,
+    GetTradeRequest,
+    GetTradeResponse,
+    GetUserInfoRequest, GetUserInfoResponse,
+    OrderRequest,
+    OrderResponse
+} from './types';
 
 config()
 
@@ -40,19 +55,19 @@ export class InterfaceClass {
         return this.tokenUb!
     }
 
-    async sendGetGameInfo() {
+    async sendGetGameInfo(): Promise<GetGameInfoResponse> {
         const url = `/TradeAPI/GetGameInfo`;
-        const data = {
+        const data: GetGameInfoRequest = {
             token_ub: await this.getTokenUb(),
         };
         const response = await this.session.post(url, data);
         return response.data;
     }
 
-    async sendOrder(instrument: string, localtime: number, direction: string, price: number, volume: number) {
+    async sendOrder(instrument: string, localtime: number, direction: "buy" | "sell", price: number, volume: number): Promise<OrderResponse> {
         logger.debug(`Order: Instrument: ${instrument}, Direction: ${direction}, Price: ${price}, Volume: ${volume}`);
         const url = `/TradeAPI/Order`;
-        const data = {
+        const data: OrderRequest = {
             token_ub: await this.getTokenUb(),
             user_info: "NULL",
             instrument: instrument,
@@ -65,10 +80,10 @@ export class InterfaceClass {
         return response.data;
     }
 
-    async sendCancel(instrument: string, localtime: number, index: number) {
+    async sendCancel(instrument: string, localtime: number, index: number): Promise<CancelResponse> {
         logger.debug(`Cancel: Instrument: ${instrument}, index: ${index}`);
         const url = `/TradeAPI/Cancel`;
-        const data = {
+        const data: CancelRequest = {
             token_ub: await this.getTokenUb(),
             user_info: "NULL",
             instrument: instrument,
@@ -79,10 +94,10 @@ export class InterfaceClass {
         return response.data;
     }
 
-    async sendGetLimitOrderBook(instrument: string) {
+    async sendGetLimitOrderBook(instrument: string): Promise<GetLimitOrderBookResponse|void> {
         try {
             const url = `/TradeAPI/GetLimitOrderBook`;
-            const data = {
+            const data: GetLimitOrderBookRequest = {
                 token_ub: await this.getTokenUb(),
                 instrument: instrument
             };
@@ -93,27 +108,27 @@ export class InterfaceClass {
         }
     }
 
-    async sendGetUserInfo() {
+    async sendGetUserInfo(): Promise<GetUserInfoResponse> {
         const url = `/TradeAPI/GetUserInfo`;
-        const data = {
+        const data: GetUserInfoRequest = {
             token_ub: await this.getTokenUb(),
         };
         const response = await this.session.post(url, data);
         return response.data;
     }
 
-    async sendGetInstrumentInfo() {
+    async sendGetInstrumentInfo(): Promise<GetInstrumentInfoResponse> {
         const url = `/TradeAPI/GetInstrumentInfo`;
-        const data = {
+        const data: GetInstrumentInfoRequest = {
             token_ub: await this.getTokenUb(),
         };
         const response = await this.session.post(url, data);
         return response.data;
     }
 
-    async sendGetTrade(instrument: string) {
+    async sendGetTrade(instrument: string): Promise<GetTradeResponse> {
         const url = `/TradeAPI/GetTrade`;
-        const data = {
+        const data: GetTradeRequest = {
             token_ub: await this.getTokenUb(),
             instrument_name: instrument
         };
@@ -121,9 +136,9 @@ export class InterfaceClass {
         return response.data;
     }
 
-    async sendGetActiveOrder() {
+    async sendGetActiveOrder(): Promise<GetActiveOrderResponse> {
         const url = `/TradeAPI/GetActiveOrder`;
-        const data = {
+        const data: GetActiveOrderRequest = {
             token_ub: await this.getTokenUb(),
         };
         const response = await this.session.post(url, data);
