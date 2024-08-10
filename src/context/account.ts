@@ -1,0 +1,7 @@
+/*
+ order
+ cancel
+ getActiveOrder
+ getTrade
+ getUserInfo
+ */

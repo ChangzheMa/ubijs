@@ -145,3 +145,5 @@ export class InterfaceClass {
         return response.data;
     }
 }
+
+export const api = new InterfaceClass()

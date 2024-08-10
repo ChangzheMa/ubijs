@@ -1,7 +1,5 @@
-import { InterfaceClass } from './api';
+import { api } from './api'
 import { sleep, logger, appendToFile } from './util';
-
-const api = new InterfaceClass()
 
 const fetchDataByInstrumentName = async (instrumentName: string) => {
     const baseFolder = `${process.env.CSV_LOG_FOLDER}`
