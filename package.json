@@ -7,7 +7,7 @@
     "build": "tsc",
     "start": "tsc && node dist/index.js",
     "pm2": "tsc && pm2 delete all && pm2 start dist/index.js",
-    "dev": "ts-node src/index.ts"
+    "dev": "ts-node src/index-backup.ts"
   },
   "keywords": [],
   "author": "",

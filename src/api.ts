@@ -102,6 +102,14 @@ export class InterfaceClass {
                 instrument: instrument
             };
             const response = await this.session.post(url, data);
+            // 这里处理以下 response.data 里有 nan 导致无法处理的问题
+            if (response && typeof response.data == 'string') {
+                try {
+                    response.data = JSON.parse(response.data.replace('-nan', '0'))
+                } catch (e) {
+                    // do nothing
+                }
+            }
             return response.data;
         } catch (e: any) {
             logger.error(`Error when sendGetLimitOrderBook, instrument: ${instrument}, ${e.message}`)
