@@ -11,7 +11,7 @@ class Exchange {
     private api
 
     private isFetching: boolean = false
-    private lobMap: { [instrumentName in string]: dataForge.IDataFrame } = {}
+    private lobMap: { [instrumentName in string]: number[][] } = {}
 
     private constructor() {
         this.api = api
@@ -26,9 +26,7 @@ class Exchange {
 
     public resetLobMap() {
         for (const instrumentName of getInstrumentNames()) {
-            this.lobMap[instrumentName] = new dataForge.DataFrame({
-                columnNames: getLobColumns()
-            })
+            this.lobMap[instrumentName] = []
         }
     }
 
@@ -58,8 +56,7 @@ class Exchange {
                         if (lob.localtime > preLocaltime) {
                             preLocaltime = lob.localtime
                             const rowData = [lob.localtime, ...lob.askprice, ...lob.askvolume, ...lob.bidprice, ...lob.bidvolume, lob.trade_volume, lob.trade_value]
-                            this.lobMap[instrumentName] = this.lobMap[instrumentName].concat(new dataForge.DataFrame({columnNames: getLobColumns(), rows: [rowData]}))
-                            logger.info(`${instrumentName} ${lob.localtime}`)
+                            this.lobMap[instrumentName].push(rowData)
                         }
                     }
                 })
@@ -70,10 +67,12 @@ class Exchange {
         }
     }
 
-    saveGameData(gameLabel: string) {
+    async saveGameData(gameLabel: string) {
         const folderPath = `${GAME_LOG_FOLDER}/${gameLabel}`
         for (const instrument of getInstrumentNames()) {
-            appendToFile(`${folderPath}/lob_${instrument}.csv`, this.lobMap[instrument].toCSV()).then()
+            await appendToFile(`${folderPath}/lob_${instrument}.csv`, getLobColumns().join(','))
+            const data = this.lobMap[instrument].map(line => line.join(',')).join('\n')
+            await appendToFile(`${folderPath}/lob_${instrument}.csv`, data).then()
         }
     }
 }

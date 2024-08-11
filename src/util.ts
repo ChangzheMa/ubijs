@@ -13,6 +13,7 @@ export const sleep = (ms: number) => {
 
 export const appendToFile = async (filePath: string, strData: string) => {
     try {
+        filePath = filePath.replace(/:/g, '-')
         const dir = path.dirname(filePath);
         await fs.mkdir(dir, { recursive: true });
         await fs.appendFile(filePath, strData + '\n', 'utf8');
