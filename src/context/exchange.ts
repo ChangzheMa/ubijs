@@ -10,7 +10,7 @@ class Exchange {
 
     private api
 
-    private isFetching: boolean = false
+    private isInGame: boolean = false
     private lobMap: { [instrumentName in string]: number[][] } = {}
 
     private constructor() {
@@ -32,7 +32,7 @@ class Exchange {
 
     public async startFetchLob() {
         this.resetLobMap()
-        this.isFetching = true
+        this.isInGame = true
         for (const instrument of getInstrumentNames()) {
             this.fetchDataByInstrumentName(instrument).then()
             await sleep(20)
@@ -40,15 +40,15 @@ class Exchange {
     }
 
     public stopFetchLob() {
-        this.isFetching = false
+        this.isInGame = false
     }
 
     private async fetchDataByInstrumentName(instrumentName: string) {
         let preLocaltime = -1
-        while (this.isFetching) {
+        while (this.isInGame) {
             try {
                 api.sendGetLimitOrderBook(instrumentName).then((lobResponse: any) => {
-                    if (!this.isFetching) {
+                    if (!this.isInGame) {
                         return
                     }
                     if (lobResponse && lobResponse.status == 'Success') {
