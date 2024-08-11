@@ -3,14 +3,15 @@ import { appendToFile, logger, sleep } from '../util';
 
 class Game {
 
-    private gameStatusListener: { onGameStart: () => void, onGameEnd: () => void} | undefined;
+    private gameStatusListener: { onGameStart: (gameLabel: string) => void, onGameEnd: (gameLabel: string) => void} | undefined;
 
     private isInGame: boolean = false
+    private gameLabel: string | undefined
 
     constructor() {
     }
 
-    public setGameStatusListener(listener: { onGameStart: () => void, onGameEnd: () => void}): Game {
+    public setGameStatusListener(listener: { onGameStart: (gameLabel: string) => void, onGameEnd: (gameLabel: string) => void}): Game {
         this.gameStatusListener = listener
         return this
     }
@@ -45,15 +46,15 @@ class Game {
         }
     }
 
-    private notifyGameStart() {
+    private notifyGameStart(gameLabel: string) {
         if (this.gameStatusListener) {
-            this.gameStatusListener.onGameStart()
+            this.gameStatusListener.onGameStart(gameLabel)
         }
     }
 
-    private notifyGameEnd() {
+    private notifyGameEnd(gameLabel: string) {
         if (this.gameStatusListener) {
-            this.gameStatusListener.onGameEnd()
+            this.gameStatusListener.onGameEnd(gameLabel)
         }
     }
 
@@ -62,9 +63,10 @@ class Game {
             logger.info(`Tick: ${tick}`)
             this.isInGame = newStatus
             if (newStatus) {
-                this.notifyGameStart()
+                this.gameLabel = new Date().toISOString()
+                this.notifyGameStart(this.gameLabel)
             } else {
-                this.notifyGameEnd()
+                this.notifyGameEnd(this.gameLabel || '')
             }
         }
     }

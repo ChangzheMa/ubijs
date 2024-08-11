@@ -3,6 +3,7 @@ import * as dataForge from 'data-forge'
 import 'data-forge-fs'
 import { getInstrumentNames, getLobColumns } from './ctxutil';
 import { appendToFile, logger, sleep } from '../util';
+import { GAME_LOG_FOLDER, LOB_REQUEST_DELAY_MS } from '../env';
 
 class Exchange {
     private static instance: Exchange;
@@ -34,8 +35,9 @@ class Exchange {
     public async startFetchLob() {
         this.resetLobMap()
         this.isFetching = true
-        for (const instrument of getInstrumentNames().slice(0, 1)) {
+        for (const instrument of getInstrumentNames()) {
             this.fetchDataByInstrumentName(instrument).then()
+            await sleep(20)
         }
     }
 
@@ -57,14 +59,21 @@ class Exchange {
                             preLocaltime = lob.localtime
                             const rowData = [lob.localtime, ...lob.askprice, ...lob.askvolume, ...lob.bidprice, ...lob.bidvolume, lob.trade_volume, lob.trade_value]
                             this.lobMap[instrumentName] = this.lobMap[instrumentName].concat(new dataForge.DataFrame({columnNames: getLobColumns(), rows: [rowData]}))
-                            logger.info(this.lobMap[instrumentName].toCSV())
+                            logger.info(`${instrumentName} ${lob.localtime}`)
                         }
                     }
                 })
             } catch (error) {
                 logger.warn(`Error when fetch data for ${instrumentName}, e: ${error}`)
             }
-            await sleep(Number(process.env.LOB_REQUEST_DELAY_MS) || 1000)
+            await sleep(Number(LOB_REQUEST_DELAY_MS))
+        }
+    }
+
+    saveGameData(gameLabel: string) {
+        const folderPath = `${GAME_LOG_FOLDER}/${gameLabel}`
+        for (const instrument of getInstrumentNames()) {
+            appendToFile(`${folderPath}/lob_${instrument}.csv`, this.lobMap[instrument].toCSV()).then()
         }
     }
 }

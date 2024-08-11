@@ -1,8 +1,9 @@
 import { api } from './api'
 import { sleep, logger, appendToFile } from './util';
+import { CSV_LOG_FOLDER, LOB_REQUEST_DELAY_MS } from './env';
 
 const fetchDataByInstrumentName = async (instrumentName: string) => {
-    const baseFolder = `${process.env.CSV_LOG_FOLDER}`
+    const baseFolder = `${CSV_LOG_FOLDER}`
     const logPath = `${baseFolder}/${instrumentName}.csv`
     // const errPath = `${baseFolder}/${instrumentName}.error.log`
     // const invalidPath = `${baseFolder}/${instrumentName}.invalid.log`
@@ -26,7 +27,7 @@ const fetchDataByInstrumentName = async (instrumentName: string) => {
         } catch (error) {
             logger.warn(`Error when fetch data for ${instrumentName}, e: ${error}`)
         }
-        await sleep(Number(process.env.LOB_REQUEST_DELAY_MS) || 1000)
+        await sleep(Number(LOB_REQUEST_DELAY_MS))
     }
 }
 

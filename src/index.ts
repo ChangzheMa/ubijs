@@ -5,13 +5,14 @@ import { logger } from './util';
 
 const main = async () => {
     const listener = {
-        onGameStart: (): void => {
+        onGameStart: (gameLabel: string): void => {
             logger.info(`~~~~~~~~~~~~~~~~~~ game start`)
             exchange.startFetchLob()
         },
-        onGameEnd: (): void => {
+        onGameEnd: (gameLabel: string): void => {
             logger.info(`~~~~~~~~~~~~~~~~~~ game end`)
             exchange.stopFetchLob()
+            exchange.saveGameData(gameLabel)
         }
     }
     game.setGameStatusListener(listener).start().then()

@@ -16,6 +16,7 @@ import {
     OrderRequest,
     OrderResponse
 } from './types';
+import { PASS_WORD, USER_NAME } from './env';
 
 config()
 
@@ -48,8 +49,8 @@ export class InterfaceClass {
 
     private async getTokenUb(): Promise<string> {
         if (!this.tokenUb) {
-            const username = process.env.USER_NAME!
-            const password = process.env.PASS_WORD!
+            const username = USER_NAME
+            const password = PASS_WORD
             await this.sendLogin(username, password);
         }
         return this.tokenUb!
