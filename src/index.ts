@@ -7,12 +7,12 @@ const main = async () => {
     const listener = {
         onGameStart: (gameLabel: string): void => {
             logger.info(`~~~~~~~~~~~~~~~~~~ game start`)
-            exchange.startFetchLob()
+            exchange.startFetchLob().then()
         },
         onGameEnd: (gameLabel: string): void => {
             logger.info(`~~~~~~~~~~~~~~~~~~ game end`)
             exchange.stopFetchLob()
-            exchange.saveGameData(gameLabel)
+            exchange.saveGameData(gameLabel).then()
         }
     }
     game.setGameStatusListener(listener).start().then()
