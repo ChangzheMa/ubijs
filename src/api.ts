@@ -93,9 +93,9 @@ export class InterfaceClass {
         const url = `/TradeAPI/Cancel`;
         const data: CancelRequest = {
             token_ub: await this.getTokenUb(),
-            user_info: "NULL",
+            user_info: "",
             instrument: instrument,
-            localtime: 0,
+            localtime: localtime,
             index: index
         };
         const response = await this.session.post(url, data);

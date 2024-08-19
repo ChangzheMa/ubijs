@@ -86,6 +86,7 @@ export interface GetActiveOrderRequest {
 }
 
 export interface ActiveOrder {
+    instrument_name?: string;
     order_index: number;
     order_price: number;
     volume: number;
@@ -225,3 +226,4 @@ export type LobColumnName =
     'BidPrice1' | 'BidPrice2' | 'BidPrice3' | 'BidPrice4' | 'BidPrice5' | 'BidPrice6' | 'BidPrice7' | 'BidPrice8' | 'BidPrice9' | 'BidPrice10' |
     'BidVolume1' | 'BidVolume2' | 'BidVolume3' | 'BidVolume4' | 'BidVolume5' | 'BidVolume6' | 'BidVolume7' | 'BidVolume8' | 'BidVolume9' | 'BidVolume10' |
     'TotalTradeVolume' | 'TotalTradeValue'
+
