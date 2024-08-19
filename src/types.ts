@@ -125,6 +125,17 @@ export interface GetTradeResponse {
     status: "Success" | "Invalid User" | "No Game" | "Invalid Time" | "Invalid Instrument";
 }
 
+// TradeAPI/GetAllTrades
+export interface GetAllTradesRequest {
+    token_ub: string;
+}
+
+export interface GetAllTradesResponse {
+    response_type: string;
+    trade_list?: Trade[][];
+    status: "Success" | "Invalid User" | "No Game" | "Invalid Time";
+}
+
 // TradeAPI/GetLimitOrderBook
 export interface GetLimitOrderBookRequest {
     token_ub: string;
@@ -150,6 +161,17 @@ export interface GetLimitOrderBookResponse {
     instrument?: string;
     lob?: LimitOrderBook;
     status: "Success" | "Invalid User" | "No Game" | "Invalid Time" | "Invalid Instrument";
+}
+
+// TradeAPI/GetAllLimitOrderBooks
+export interface GetAllLimitOrderBooksRequest {
+    token_ub: string;
+}
+
+export interface GetAllLimitOrderBooksResponse {
+    response_type: string;
+    lob?: LimitOrderBook;
+    status: "Success" | "Invalid User" | "No Game" | "Invalid Time";
 }
 
 // TradeAPI/GetUserInfo

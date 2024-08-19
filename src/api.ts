@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios'
+import axios, { AxiosInstance, AxiosResponse } from 'axios'
 import { config } from 'dotenv'
 import { logger } from './util'
 import {
@@ -6,13 +6,20 @@ import {
     CancelResponse,
     GetActiveOrderRequest,
     GetActiveOrderResponse,
+    GetAllLimitOrderBooksRequest,
+    GetAllLimitOrderBooksResponse,
+    GetAllTradesRequest,
+    GetAllTradesResponse,
     GetGameInfoRequest,
-    GetGameInfoResponse, GetInstrumentInfoRequest, GetInstrumentInfoResponse,
+    GetGameInfoResponse,
+    GetInstrumentInfoRequest,
+    GetInstrumentInfoResponse,
     GetLimitOrderBookRequest,
     GetLimitOrderBookResponse,
     GetTradeRequest,
     GetTradeResponse,
-    GetUserInfoRequest, GetUserInfoResponse,
+    GetUserInfoRequest,
+    GetUserInfoResponse,
     OrderRequest,
     OrderResponse
 } from './types';
@@ -152,6 +159,36 @@ export class InterfaceClass {
         };
         const response = await this.session.post(url, data);
         return response.data;
+    }
+
+    async sendGetAllTrades(): Promise<GetAllTradesResponse> {
+        const url = `/TradeAPI/GetAllTrades`;
+        const data: GetAllTradesRequest = {
+            token_ub: await this.getTokenUb()
+        };
+        const response = await this.session.post<GetAllTradesResponse, AxiosResponse<GetAllTradesResponse>, GetAllTradesRequest>(url, data);
+        return response.data;
+    }
+
+    async sendGetAllLimitOrderBooks(): Promise<GetAllLimitOrderBooksResponse|void> {
+        try {
+            const url = `/TradeAPI/GetAllLimitOrderBooks`;
+            const data: GetAllLimitOrderBooksRequest = {
+                token_ub: await this.getTokenUb()
+            };
+            const response = await this.session.post<GetAllLimitOrderBooksResponse, any, GetAllLimitOrderBooksRequest>(url, data);
+            // 这里处理以下 response.data 里有 nan 导致无法处理的问题
+            if (response && typeof response.data == 'string') {
+                try {
+                    response.data = JSON.parse(response.data.replace('-nan', '0'))
+                } catch (e) {
+                    // do nothing
+                }
+            }
+            return response.data;
+        } catch (e: any) {
+            logger.error(`Error when sendGetAllLimitOrderBooks, ${e.message}`)
+        }
     }
 }
 
