@@ -259,6 +259,38 @@ export interface GetPrivateInfoResponse {
     status: string;
 }
 
+export interface GetPublicInfoResponse {
+    day: number;
+    response_type: string;
+    columns: PublicInfoColumn[];
+    rows: PublicInfoRow[];
+    top_user_pnl: TopUserPnl[];
+    status: string;
+}
+
+export interface PublicInfoColumn {
+    title: string;
+    width: string;
+    type: string;
+    dataIndex: string;
+}
+
+export interface PublicInfoRow {
+    user_name: string;
+    rtmean: number;
+    rtir: number;
+    rtdel: number;
+    allmean: number;
+    allir: number;
+    alldel: number;
+    ranking: number;
+}
+
+export interface TopUserPnl {
+    team: string;
+    data: number[];
+}
+
 export type LobColumnName =
     'Tick' |
     'AskPrice1' | 'AskPrice2' | 'AskPrice3' | 'AskPrice4' | 'AskPrice5' | 'AskPrice6' | 'AskPrice7' | 'AskPrice8' | 'AskPrice9' | 'AskPrice10' |

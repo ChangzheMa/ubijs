@@ -22,7 +22,7 @@ import {
     GetUserInfoResponse,
     OrderRequest,
     OrderResponse,
-    GetPrivateInfoResponse
+    GetPrivateInfoResponse, GetPublicInfoResponse
 } from './types';
 import { PASS_WORD, USER_NAME } from './env';
 
@@ -164,6 +164,15 @@ export class InterfaceClass {
 
     async sendGetPrivateInfo(): Promise<GetPrivateInfoResponse> {
         const url = `/Info/User/PrivateInfo`;
+        const data: GetUserInfoRequest = {
+            token_ub: await this.getTokenUb(),
+        };
+        const response = await this.session.post(url, data);
+        return response.data;
+    }
+
+    async sendGetPublicInfo(): Promise<GetPublicInfoResponse> {
+        const url = `/Info/User/PublicInfo`;
         const data: GetUserInfoRequest = {
             token_ub: await this.getTokenUb(),
         };
