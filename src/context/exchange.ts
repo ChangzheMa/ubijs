@@ -1,4 +1,4 @@
-import { api } from '../api'
+import { api, InterfaceClass } from '../api'
 import * as dataForge from 'data-forge'
 import 'data-forge-fs'
 import { getInstrumentNames, getLobColumns } from './ctxutil';
@@ -8,7 +8,7 @@ import { GAME_LOG_FOLDER, LOB_REQUEST_DELAY_MS } from '../env';
 class Exchange {
     private static instance: Exchange;
 
-    private api
+    private api: InterfaceClass
 
     private isInGame: boolean = false
     private lobMap: { [instrumentName in string]: number[][] } = {}
@@ -41,6 +41,17 @@ class Exchange {
 
     public stopFetchLob() {
         this.isInGame = false
+    }
+
+    public getLatestLocaltime(): number {
+        let localtime = this.isInGame ? 1 : 0
+        for (const instrumentName of getInstrumentNames()) {
+            const lob = this.lobMap[instrumentName]
+            if (lob) {
+                localtime = Math.max(localtime, lob[lob.length-1][0])
+            }
+        }
+        return localtime
     }
 
     private async fetchDataByInstrumentName(instrumentName: string) {

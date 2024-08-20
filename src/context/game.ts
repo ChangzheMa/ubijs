@@ -66,6 +66,10 @@ class Game {
         await appendToFile(`${folderPath}/rank.log`, JSON.stringify(this.publicInfo)).then()
     }
 
+    public getIsInGame(): boolean {
+        return this.isInGame
+    }
+
     private notifyGameStart(gameLabel: string) {
         if (this.gameStatusListener) {
             this.gameStatusListener.onGameStart(gameLabel)
