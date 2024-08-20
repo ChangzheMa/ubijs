@@ -34,7 +34,7 @@ class Account {
     public async resetOrderAndStartFetchData() {
         // 取消全部订单
         const activeOrderResponse = await api.sendGetActiveOrder()
-        logger.info(`activeOrdersResponse: ${JSON.stringify(activeOrderResponse)}`)
+        // logger.info(`activeOrdersResponse: ${JSON.stringify(activeOrderResponse)}`)
         if (activeOrderResponse.status == "Success") {
             activeOrderResponse.instruments?.forEach((instrumentActiveOrder: InstrumentActiveOrder) => {
                 const instrumentName = instrumentActiveOrder.instrument_name
@@ -54,7 +54,7 @@ class Account {
             await sleep(500)
             userInfoResponse = await api.sendGetUserInfo()
         }
-        logger.info(`Init userInfo, userInfoResponse: ${JSON.stringify(userInfoResponse)}`)
+        // logger.info(`Init userInfo, userInfoResponse: ${JSON.stringify(userInfoResponse)}`)
         this.stockInfoMap = new Map()
         userInfoResponse.rows?.forEach((row: UserStockInfo) => {
             this.stockInfoMap.set(row.instrument_name, row)
@@ -137,7 +137,7 @@ class Account {
         while (this.isInGame) {
             const userInfoResponse = await api.sendGetUserInfo()
             if (userInfoResponse.status == "Success") {
-                logger.info(`Refresh userInfo, userInfoResponse: ${JSON.stringify(userInfoResponse)}`)
+                // logger.info(`Refresh userInfo, userInfoResponse: ${JSON.stringify(userInfoResponse)}`)
                 userInfoResponse.rows?.forEach((row: UserStockInfo) => {
                     this.stockInfoMap.set(row.instrument_name, row)
                 })
