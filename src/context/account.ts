@@ -3,6 +3,7 @@ import { logger, sleep } from '../util';
 import {
     ActiveOrder,
     InstrumentActiveOrder,
+    OrderResponse,
     Trade,
     UserStockInfo
 } from '../types';
@@ -86,26 +87,47 @@ class Account {
      * @param instrumentName 股票名
      * @param price 价格
      * @param volume 数量
+     * @param localtime 订单时间戳，不写默认为 0
      * @return 是否下单成功
      */
-    public async sendOrder(instrumentName: string, price: number, volume: number): Promise<boolean> {
-
+    public async sendOrder(instrumentName: string, price: number, volume: number, localtime: number=0): Promise<boolean> {
+        const direction = volume > 0 ? 'buy' : 'sell';
+        const orderResponse: OrderResponse = await api.sendOrder(instrumentName, direction, price, volume, localtime)
+        if (orderResponse && orderResponse.status == "Success") {
+            this.activeOrders.push({
+                instrument_name: instrumentName,
+                order_index: orderResponse.index!,
+                order_price: price,
+                volume: volume,
+                direction: direction
+            })
+            return true
+        }
+        return false
     }
 
     /**
      * 按股票名撤所有订单
      * @param instrumentName 股票名
      */
-    public async cancelOrder(instrumentName: string): Promise<void> {
-
+    public async cancelOrderByInstrument(instrumentName: string): Promise<void> {
+        this.activeOrders.filter(item => item.instrument_name == instrumentName)
+            .forEach((item) => this.cancelOrderByIndex(instrumentName, item.order_index))
     }
 
     /**
-     * 撤所有过期订单
-     * @param expireTimeInLocaltime 过期时间，以交易所tick为单位，默认50 tick
+     * 按 order_index 撤销订单
      */
-    public async cancelExpiredOrders(expireTimeInLocaltime: number=50): Promise<void> {
-
+    public async cancelOrderByIndex(instrumentName: string, orderIndex: number, localtime: number=0): Promise<boolean> {
+        const cancelResponse = await api.sendCancel(instrumentName, orderIndex, localtime)
+        if (cancelResponse) {
+            if (["Success", "No Order Index", "No Order", "Canceled Order"].includes(cancelResponse.status)) {
+                // 撤单成功 or 本来就不存在的订单
+                this.activeOrders = this.activeOrders.filter(item => item.order_index != orderIndex)
+                return true
+            }
+        }
+        return false
     }
 
     /**

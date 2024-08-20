@@ -72,7 +72,7 @@ export class InterfaceClass {
         return response.data;
     }
 
-    async sendOrder(instrument: string, localtime: number, direction: "buy" | "sell", price: number, volume: number): Promise<OrderResponse> {
+    async sendOrder(instrument: string, direction: "buy" | "sell", price: number, volume: number, localtime: number): Promise<OrderResponse> {
         logger.debug(`Order: Instrument: ${instrument}, Direction: ${direction}, Price: ${price}, Volume: ${volume}`);
         const url = `/TradeAPI/Order`;
         const data: OrderRequest = {
@@ -88,7 +88,7 @@ export class InterfaceClass {
         return response.data;
     }
 
-    async sendCancel(instrument: string, localtime: number, index: number): Promise<CancelResponse> {
+    async sendCancel(instrument: string, index: number, localtime: number): Promise<CancelResponse> {
         logger.debug(`Cancel: Instrument: ${instrument}, index: ${index}`);
         const url = `/TradeAPI/Cancel`;
         const data: CancelRequest = {
