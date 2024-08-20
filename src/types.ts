@@ -219,6 +219,46 @@ export interface GetInstrumentInfoResponse {
     status: "Success" | "Invalid User";
 }
 
+// getPrivateInfo
+export interface Column {
+    title: string;
+    width: string;
+    type: string;
+    dataIndex: string;
+}
+
+export interface Row {
+    instrument_name: string;
+    share_holding: number;
+    orders: number;
+    error_orders: number;
+    order_value: number;
+    trade_value: number;
+    target_volume: number;
+    remain_volume: number;
+    frozen_volume: number;
+    rtdel: number;
+}
+
+export interface GetPrivateInfoResponse {
+    response_type: string;
+    day: number;
+    teamname: string;
+    pnl: number;
+    sharpe: number;
+    orders: number;
+    error_orders: number;
+    order_value: number;
+    trade_value: number;
+    commision: number;
+    total_position: number;
+    remain_funds: number;
+    pnl_list: number[];
+    columns: Column[];
+    rows: Row[];
+    status: string;
+}
+
 export type LobColumnName =
     'Tick' |
     'AskPrice1' | 'AskPrice2' | 'AskPrice3' | 'AskPrice4' | 'AskPrice5' | 'AskPrice6' | 'AskPrice7' | 'AskPrice8' | 'AskPrice9' | 'AskPrice10' |

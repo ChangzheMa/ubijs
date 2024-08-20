@@ -1,5 +1,7 @@
 import { api } from '../api';
 import { appendToFile, logger, sleep } from '../util';
+import { GAME_LOG_FOLDER } from '../env';
+import { GetPrivateInfoResponse } from '../types';
 
 class Game {
 
@@ -7,6 +9,7 @@ class Game {
 
     private isInGame: boolean = false
     private gameLabel: string | undefined
+    private privateInfo: GetPrivateInfoResponse | undefined
 
     constructor() {
     }
@@ -42,8 +45,18 @@ class Game {
                 }
 
             })
+            api.sendGetPrivateInfo().then(response => {
+                if (response && response.status == "Success") {
+                    this.privateInfo = response
+                }
+            })
             await sleep(1000)
         }
+    }
+
+    public async saveScoreData(gameLabel: string) {
+        const folderPath = `${GAME_LOG_FOLDER}/${gameLabel}`
+        await appendToFile(`${folderPath}/conclusion.log`, JSON.stringify(this.privateInfo)).then()
     }
 
     private notifyGameStart(gameLabel: string) {

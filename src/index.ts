@@ -16,6 +16,7 @@ const main = async () => {
             account.stopFetchData()
             exchange.stopFetchLob()
             exchange.saveGameData(gameLabel).then()
+            game.saveScoreData(gameLabel).then()
         }
     }
     game.setGameStatusListener(listener).start().then()

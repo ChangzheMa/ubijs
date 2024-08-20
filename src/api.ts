@@ -21,7 +21,8 @@ import {
     GetUserInfoRequest,
     GetUserInfoResponse,
     OrderRequest,
-    OrderResponse
+    OrderResponse,
+    GetPrivateInfoResponse
 } from './types';
 import { PASS_WORD, USER_NAME } from './env';
 
@@ -155,6 +156,15 @@ export class InterfaceClass {
     async sendGetActiveOrder(): Promise<GetActiveOrderResponse> {
         const url = `/TradeAPI/GetActiveOrder`;
         const data: GetActiveOrderRequest = {
+            token_ub: await this.getTokenUb(),
+        };
+        const response = await this.session.post(url, data);
+        return response.data;
+    }
+
+    async sendGetPrivateInfo(): Promise<GetPrivateInfoResponse> {
+        const url = `/Info/User/PrivateInfo`;
+        const data: GetUserInfoRequest = {
             token_ub: await this.getTokenUb(),
         };
         const response = await this.session.post(url, data);
