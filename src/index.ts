@@ -4,7 +4,7 @@ import { account } from './context/account';
 import { appendToFile, logger, sleep } from './util';
 import { GAME_LOG_FOLDER, TRADE_TICK_COUNT_PER_DAY, TRADING_CYCLE_TICKS } from './env';
 import { getInstrumentNames } from './context/ctxutil';
-import { ActiveOrder, UserStockInfo } from './types';
+import { UserStockInfo } from './types';
 
 
 const appendLog = async (logStr: string): Promise<void> => {
@@ -12,22 +12,7 @@ const appendLog = async (logStr: string): Promise<void> => {
     await appendToFile(`${folderPath}/order.log`, logStr)
 }
 
-const tradeForInstrument = async (instrumentName: string) => {
-
-}
-
-const clearForInstrument = async (instrumentName: string) => {
-    const stockInfo: UserStockInfo | undefined = account.getStockInfoByInstrumentName(instrumentName)
-    if (!stockInfo) {
-        return
-    }
-
-    const remainVolume = stockInfo.remain_volume
-    let unfilledVolume = 0
-    account.getActiveOrdersByInstrumentName(instrumentName).forEach((order: ActiveOrder) => {
-        unfilledVolume += order.volume
-    })
-    const orderVolume = remainVolume - unfilledVolume
+async function sendMarketOrderByInstrumentAndVolume(instrumentName: string, orderVolume: number) {
     const [ask, bid] = exchange.getBestPriceByInstrumentName(instrumentName)
 
     let price = 0
@@ -45,6 +30,32 @@ const clearForInstrument = async (instrumentName: string) => {
             }
         })
     }
+}
+
+const tradeForInstrument = async (instrumentName: string) => {
+    const stockInfo: UserStockInfo | undefined = account.getStockInfoByInstrumentName(instrumentName)
+    if (!stockInfo) {
+        return
+    }
+
+    const remainVolume = stockInfo.remain_volume    // 实际剩余量
+    const currentLocaltime = exchange.getLatestLocaltime()
+    const skipTicks = Math.round((3000 - Number(TRADE_TICK_COUNT_PER_DAY)) / 2)
+    const targetRemainVolume = stockInfo.target_volume / Number(TRADE_TICK_COUNT_PER_DAY) * (Number(TRADE_TICK_COUNT_PER_DAY) + skipTicks - currentLocaltime)
+    if (Math.abs(remainVolume) > Math.abs(targetRemainVolume)) {
+        const orderVolume = Math.round((remainVolume - targetRemainVolume) / 100) * 100
+        await sendMarketOrderByInstrumentAndVolume(instrumentName, orderVolume)
+    }
+}
+
+const clearForInstrument = async (instrumentName: string) => {
+    const stockInfo: UserStockInfo | undefined = account.getStockInfoByInstrumentName(instrumentName)
+    if (!stockInfo) {
+        return
+    }
+
+    const orderVolume = stockInfo.remain_volume
+    await sendMarketOrderByInstrumentAndVolume(instrumentName, orderVolume)
 }
 
 const main = async () => {
