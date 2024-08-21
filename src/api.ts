@@ -41,18 +41,22 @@ export class InterfaceClass {
     }
 
     private async sendLogin(username: string, password: string) {
-        const url = `/Login`;
-        const data = {
-            user: username,
-            password: password
-        };
-        const response = await this.session.post(url, data);
-        if (response.data.status == 'Success') {
-            this.tokenUb = response.data.token_ub;
-        } else {
-            throw new Error(`Error when login: ${response.status}, ${JSON.stringify(response.data)}`)
+        try {
+            const url = `/Login`;
+            const data = {
+                user: username,
+                password: password
+            };
+            const response = await this.session.post(url, data);
+            if (response.data.status == 'Success') {
+                this.tokenUb = response.data.token_ub;
+            } else {
+                throw new Error(`Error when login: ${response.status}, ${JSON.stringify(response.data)}`)
+            }
+            return response.data;
+        } catch (e: any) {
+            logger.error(`Error when sendLogin, ${e.message}`)
         }
-        return response.data;
     }
 
     private async getTokenUb(): Promise<string> {
@@ -64,43 +68,53 @@ export class InterfaceClass {
         return this.tokenUb!
     }
 
-    async sendGetGameInfo(): Promise<GetGameInfoResponse> {
-        const url = `/TradeAPI/GetGameInfo`;
-        const data: GetGameInfoRequest = {
-            token_ub: await this.getTokenUb(),
-        };
-        const response = await this.session.post(url, data);
-        return response.data;
+    async sendGetGameInfo(): Promise<GetGameInfoResponse|void> {
+        try {
+            const url = `/TradeAPI/GetGameInfo`;
+            const data: GetGameInfoRequest = {
+                token_ub: await this.getTokenUb(),
+            };
+            const response = await this.session.post(url, data);
+            return response.data;
+        } catch (e: any) {
+            logger.error(`Error when sendGetGameInfo, ${e.message}`)
+        }
     }
 
-    async sendOrder(instrument: string, direction: "buy" | "sell", price: number, volume: number, localtime: number): Promise<OrderResponse> {
-        logger.debug(`Order: Instrument: ${instrument}, Direction: ${direction}, Price: ${price}, Volume: ${volume}`);
-        const url = `/TradeAPI/Order`;
-        const data: OrderRequest = {
-            token_ub: await this.getTokenUb(),
-            user_info: "NULL",
-            instrument: instrument,
-            localtime: localtime,
-            direction: direction,
-            price: price,
-            volume: volume,
-        };
-        const response = await this.session.post(url, data);
-        return response.data;
+    async sendOrder(instrument: string, direction: "buy" | "sell", price: number, volume: number, localtime: number): Promise<OrderResponse|void> {
+        try {
+            const url = `/TradeAPI/Order`;
+            const data: OrderRequest = {
+                token_ub: await this.getTokenUb(),
+                user_info: "NULL",
+                instrument: instrument,
+                localtime: localtime,
+                direction: direction,
+                price: price,
+                volume: volume,
+            };
+            const response = await this.session.post(url, data);
+            return response.data;
+        } catch (e: any) {
+            logger.error(`Error when sendOrder, ${instrument}, ${direction}, ${price}, ${volume}, ${localtime}, ${e.message}`)
+        }
     }
 
-    async sendCancel(instrument: string, index: number, localtime: number): Promise<CancelResponse> {
-        logger.debug(`Cancel: Instrument: ${instrument}, index: ${index}`);
-        const url = `/TradeAPI/Cancel`;
-        const data: CancelRequest = {
-            token_ub: await this.getTokenUb(),
-            user_info: "",
-            instrument: instrument,
-            localtime: localtime,
-            index: index
-        };
-        const response = await this.session.post(url, data);
-        return response.data;
+    async sendCancel(instrument: string, index: number, localtime: number): Promise<CancelResponse|void> {
+        try {
+            const url = `/TradeAPI/Cancel`;
+            const data: CancelRequest = {
+                token_ub: await this.getTokenUb(),
+                user_info: "",
+                instrument: instrument,
+                localtime: localtime,
+                index: index
+            };
+            const response = await this.session.post(url, data);
+            return response.data;
+        } catch (e: any) {
+            logger.error(`Error when sendCancel, instrument: ${instrument}, index: ${index}, ${e.message}`)
+        }
     }
 
     async sendGetLimitOrderBook(instrument: string): Promise<GetLimitOrderBookResponse|void> {
@@ -125,68 +139,98 @@ export class InterfaceClass {
         }
     }
 
-    async sendGetUserInfo(): Promise<GetUserInfoResponse> {
-        const url = `/TradeAPI/GetUserInfo`;
-        const data: GetUserInfoRequest = {
-            token_ub: await this.getTokenUb(),
-        };
-        const response = await this.session.post(url, data);
-        return response.data;
+    async sendGetUserInfo(): Promise<GetUserInfoResponse|void> {
+        try {
+            const url = `/TradeAPI/GetUserInfo`;
+            const data: GetUserInfoRequest = {
+                token_ub: await this.getTokenUb(),
+            };
+            const response = await this.session.post(url, data);
+            return response.data;
+        } catch (e: any) {
+            logger.error(`Error when sendGetUserInfo, ${e.message}`)
+        }
     }
 
-    async sendGetInstrumentInfo(): Promise<GetInstrumentInfoResponse> {
-        const url = `/TradeAPI/GetInstrumentInfo`;
-        const data: GetInstrumentInfoRequest = {
-            token_ub: await this.getTokenUb(),
-        };
-        const response = await this.session.post(url, data);
-        return response.data;
+    async sendGetInstrumentInfo(): Promise<GetInstrumentInfoResponse|void> {
+        try {
+            const url = `/TradeAPI/GetInstrumentInfo`;
+            const data: GetInstrumentInfoRequest = {
+                token_ub: await this.getTokenUb(),
+            };
+            const response = await this.session.post(url, data);
+            return response.data;
+        } catch (e: any) {
+            logger.error(`Error when sendGetInstrumentInfo, ${e.message}`)
+        }
     }
 
-    async sendGetTrade(instrument: string): Promise<GetTradeResponse> {
-        const url = `/TradeAPI/GetTrade`;
-        const data: GetTradeRequest = {
-            token_ub: await this.getTokenUb(),
-            instrument_name: instrument
-        };
-        const response = await this.session.post(url, data);
-        return response.data;
+    async sendGetTrade(instrument: string): Promise<GetTradeResponse|void> {
+        try {
+            const url = `/TradeAPI/GetTrade`;
+            const data: GetTradeRequest = {
+                token_ub: await this.getTokenUb(),
+                instrument_name: instrument
+            };
+            const response = await this.session.post(url, data);
+            return response.data;
+        } catch (e: any) {
+            logger.error(`Error when sendGetTrade, instrument: ${instrument}, ${e.message}`)
+        }
     }
 
-    async sendGetActiveOrder(): Promise<GetActiveOrderResponse> {
-        const url = `/TradeAPI/GetActiveOrder`;
-        const data: GetActiveOrderRequest = {
-            token_ub: await this.getTokenUb(),
-        };
-        const response = await this.session.post(url, data);
-        return response.data;
+    async sendGetActiveOrder(): Promise<GetActiveOrderResponse|void> {
+        try {
+            const url = `/TradeAPI/GetActiveOrder`;
+            const data: GetActiveOrderRequest = {
+                token_ub: await this.getTokenUb(),
+            };
+            const response = await this.session.post(url, data);
+            return response.data;
+        } catch (e: any) {
+            logger.error(`Error when sendGetActiveOrder, ${e.message}`)
+        }
+
     }
 
-    async sendGetPrivateInfo(): Promise<GetPrivateInfoResponse> {
-        const url = `/Info/User/PrivateInfo`;
-        const data: GetUserInfoRequest = {
-            token_ub: await this.getTokenUb(),
-        };
-        const response = await this.session.post(url, data);
-        return response.data;
+    async sendGetPrivateInfo(): Promise<GetPrivateInfoResponse|void> {
+        try {
+            const url = `/Info/User/PrivateInfo`;
+            const data: GetUserInfoRequest = {
+                token_ub: await this.getTokenUb(),
+            };
+            const response = await this.session.post(url, data);
+            return response.data;
+        } catch (e: any) {
+            logger.error(`Error when sendGetPrivateInfo, ${e.message}`)
+        }
     }
 
-    async sendGetPublicInfo(): Promise<GetPublicInfoResponse> {
-        const url = `/Info/User/PublicInfo`;
-        const data: GetUserInfoRequest = {
-            token_ub: await this.getTokenUb(),
-        };
-        const response = await this.session.post(url, data);
-        return response.data;
+    async sendGetPublicInfo(): Promise<GetPublicInfoResponse|void> {
+        try {
+            const url = `/Info/User/PublicInfo`;
+            const data: GetUserInfoRequest = {
+                token_ub: await this.getTokenUb(),
+            };
+            const response = await this.session.post(url, data);
+            return response.data;
+
+        } catch (e: any) {
+            logger.error(`Error when sendGetPublicInfo, ${e.message}`)
+        }
     }
 
-    async sendGetAllTrades(): Promise<GetAllTradesResponse> {
-        const url = `/TradeAPI/GetAllTrades`;
-        const data: GetAllTradesRequest = {
-            token_ub: await this.getTokenUb()
-        };
-        const response = await this.session.post<GetAllTradesResponse, AxiosResponse<GetAllTradesResponse>, GetAllTradesRequest>(url, data);
-        return response.data;
+    async sendGetAllTrades(): Promise<GetAllTradesResponse|void> {
+        try {
+            const url = `/TradeAPI/GetAllTrades`;
+            const data: GetAllTradesRequest = {
+                token_ub: await this.getTokenUb()
+            };
+            const response = await this.session.post<GetAllTradesResponse, AxiosResponse<GetAllTradesResponse>, GetAllTradesRequest>(url, data);
+            return response.data;
+        } catch (e: any) {
+            logger.error(`Error when sendGetAllTrades, ${e.message}`)
+        }
     }
 
     async sendGetAllLimitOrderBooks(): Promise<GetAllLimitOrderBooksResponse|void> {

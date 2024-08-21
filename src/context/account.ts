@@ -35,7 +35,7 @@ class Account {
         // 取消全部订单
         const activeOrderResponse = await api.sendGetActiveOrder()
         // logger.info(`activeOrdersResponse: ${JSON.stringify(activeOrderResponse)}`)
-        if (activeOrderResponse.status == "Success") {
+        if (activeOrderResponse && activeOrderResponse.status == "Success") {
             activeOrderResponse.instruments?.forEach((instrumentActiveOrder: InstrumentActiveOrder) => {
                 const instrumentName = instrumentActiveOrder.instrument_name
                 instrumentActiveOrder.active_orders.forEach((order: ActiveOrder) => {
@@ -50,7 +50,7 @@ class Account {
 
         // 获取 accountInfo
         let userInfoResponse = await api.sendGetUserInfo()
-        while (userInfoResponse.status != "Success") {
+        while (!userInfoResponse || userInfoResponse.status != "Success") {
             await sleep(500)
             userInfoResponse = await api.sendGetUserInfo()
         }
@@ -96,7 +96,7 @@ class Account {
      */
     public async sendOrder(instrumentName: string, price: number, volume: number, localtime: number=0): Promise<boolean> {
         const direction = volume > 0 ? 'buy' : 'sell';
-        const orderResponse: OrderResponse = await api.sendOrder(instrumentName, direction, price, Math.abs(volume), localtime)
+        const orderResponse: OrderResponse|void = await api.sendOrder(instrumentName, direction, price, Math.abs(volume), localtime)
         if (orderResponse && orderResponse.status == "Success") {
             this.activeOrders.push({
                 instrument_name: instrumentName,
@@ -145,7 +145,7 @@ class Account {
     private async updateAccountInfoTimed() {
         while (this.isInGame) {
             const userInfoResponse = await api.sendGetUserInfo()
-            if (userInfoResponse.status == "Success") {
+            if (userInfoResponse && userInfoResponse.status == "Success") {
                 // logger.info(`Refresh userInfo, userInfoResponse: ${JSON.stringify(userInfoResponse)}`)
                 userInfoResponse.rows?.forEach((row: UserStockInfo) => {
                     this.stockInfoMap.set(row.instrument_name, row)
