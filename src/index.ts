@@ -58,6 +58,20 @@ const clearForInstrument = async (instrumentName: string) => {
     await sendMarketOrderByInstrumentAndVolume(instrumentName, orderVolume)
 }
 
+const tradeForAllInstrument = async () => {
+    for (const instrumentName of getInstrumentNames()) {
+        tradeForInstrument(instrumentName).then()
+        await sleep(20)
+    }
+}
+
+const clearForAllInstrument = async() => {
+    for (const instrumentName of getInstrumentNames()) {
+        clearForInstrument(instrumentName).then()
+        await sleep(20)
+    }
+}
+
 const main = async () => {
     const listener = {
         onGameStart: (gameLabel: string): void => {
@@ -88,15 +102,11 @@ const main = async () => {
             } else if (currentLocaltime > skipTicks && currentLocaltime < 3000 - skipTicks) {    // 只在中间 2800 tick 交易
                 stockCleared = false
                 // 这里对每一个股票进行交易
-                for (const instrumentName of getInstrumentNames()) {
-                    tradeForInstrument(instrumentName).then()
-                }
+                tradeForAllInstrument().then()
             } else if (currentLocaltime > 3000 - skipTicks) {
                 // 这里对每一个股票进行清仓
                 if (!stockCleared) {
-                    for (const instrumentName of getInstrumentNames()) {
-                        clearForInstrument(instrumentName).then()
-                    }
+                    clearForAllInstrument().then()
                     stockCleared = true
                 }
             }
