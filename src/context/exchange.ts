@@ -47,7 +47,7 @@ class Exchange {
         let localtime = this.isInGame ? 1 : 0
         for (const instrumentName of getInstrumentNames()) {
             const lob = this.lobMap[instrumentName]
-            if (lob) {
+            if (lob && lob.length > 0) {
                 localtime = Math.max(localtime, lob[lob.length-1][0])
             }
         }
@@ -60,7 +60,7 @@ class Exchange {
      */
     public getBestPriceByInstrumentName(instrumentName: string): number[] {
         const lob = this.lobMap[instrumentName]
-        if (lob) {
+        if (lob && lob.length > 0) {
             return [lob[lob.length-1][1], lob[lob.length-1][21]]
         }
         return [0, 0]
