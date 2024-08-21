@@ -26,7 +26,7 @@ async function sendMarketOrderByInstrumentAndVolume(instrumentName: string, orde
         const localtime = exchange.getLatestLocaltime()
         account.sendOrder(instrumentName, price, orderVolume, localtime).then(success => {
             if (success) {
-                appendLog(`${localtime}, SendOrder: ${instrumentName}, ${orderVolume}, ${price}`)
+                appendLog(`${localtime}, SendOrder: ${instrumentName}, ${price}, ${orderVolume}`)
             }
         })
     }

@@ -105,6 +105,7 @@ class Account {
                 volume: volume,
                 direction: direction
             })
+            logger.info(`${localtime}, SendOrder: ${instrumentName}, ${price}, ${volume}`)
             return true
         } else {
             logger.error(`sendOrder error: ${JSON.stringify(orderResponse)}`)
@@ -125,9 +126,11 @@ class Account {
      * 按 order_index 撤销订单
      */
     public async cancelOrderByIndex(instrumentName: string, orderIndex: number, localtime: number=0): Promise<boolean> {
+        const order = this.activeOrders.find(order => order.order_index == orderIndex)
         const cancelResponse = await api.sendCancel(instrumentName, orderIndex, localtime)
         if (cancelResponse) {
             if (["Success", "No Order Index", "No Order", "Canceled Order"].includes(cancelResponse.status)) {
+                logger.info(`${localtime}, CancelOrder: ${instrumentName}, ${order?.order_price}, ${order?.volume}, (${cancelResponse.status}, ${order?.order_index})`)
                 // 撤单成功 or 本来就不存在的订单
                 this.activeOrders = this.activeOrders.filter(item => item.order_index != orderIndex)
                 return true
