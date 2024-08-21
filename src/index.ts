@@ -17,9 +17,9 @@ async function sendMarketOrderByInstrumentAndVolume(instrumentName: string, orde
 
     let price = 0
     if (orderVolume > 0 && ask > 0) {   // 买
-        price = ask + 0.02
+        price = ask + 0.01
     } else if (orderVolume < 0 && bid > 0) {    // 卖
-        price = bid - 0.02
+        price = bid - 0.01
     }
     if (Math.abs(orderVolume) > 0 && price > 0) {     // 确实需要交易
         await account.cancelOrderByInstrument(instrumentName)
