@@ -34,7 +34,6 @@ class Account {
     public async resetOrderAndStartFetchData() {
         // 取消全部订单
         const activeOrderResponse = await api.sendGetActiveOrder()
-        // logger.info(`activeOrdersResponse: ${JSON.stringify(activeOrderResponse)}`)
         if (activeOrderResponse && activeOrderResponse.status == "Success") {
             activeOrderResponse.instruments?.forEach((instrumentActiveOrder: InstrumentActiveOrder) => {
                 const instrumentName = instrumentActiveOrder.instrument_name
@@ -54,7 +53,6 @@ class Account {
             await sleep(500)
             userInfoResponse = await api.sendGetUserInfo()
         }
-        // logger.info(`Init userInfo, userInfoResponse: ${JSON.stringify(userInfoResponse)}`)
         this.stockInfoMap = new Map()
         userInfoResponse.rows?.forEach((row: UserStockInfo) => {
             this.stockInfoMap.set(row.instrument_name, row)
@@ -118,6 +116,8 @@ class Account {
      * @param instrumentName 股票名
      */
     public async cancelOrderByInstrument(instrumentName: string): Promise<void> {
+        // logger.info(`activeOrders count: ${this.activeOrders.length}`)
+        // logger.info(`Cancel: ${instrumentName}, count: ${this.activeOrders.filter(item => item.instrument_name == instrumentName).length}`)
         this.activeOrders.filter(item => item.instrument_name == instrumentName)
             .forEach((item) => this.cancelOrderByIndex(instrumentName, item.order_index))
     }
@@ -125,7 +125,7 @@ class Account {
     /**
      * 按 order_index 撤销订单
      */
-    public async cancelOrderByIndex(instrumentName: string, orderIndex: number, localtime: number=0): Promise<boolean> {
+    private async cancelOrderByIndex(instrumentName: string, orderIndex: number, localtime: number=0): Promise<boolean> {
         const order = this.activeOrders.find(order => order.order_index == orderIndex)
         const cancelResponse = await api.sendCancel(instrumentName, orderIndex, localtime)
         if (cancelResponse) {
@@ -162,7 +162,7 @@ class Account {
         while (this.isInGame) {
             const allTradesResponse = await api.sendGetAllTrades();
             if (allTradesResponse && allTradesResponse.status == "Success") {
-                this.updateLocalDataWhenAllTradesUpdated(allTradesResponse.trade_list?.flat())
+                this.updateLocalDataWhenAllTradesUpdated(allTradesResponse.trade_lists?.flat())
             }
             await sleep(Number(ALL_TRADES_REQUEST_DELAY_MS))
         }

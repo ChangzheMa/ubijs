@@ -133,7 +133,7 @@ export interface GetAllTradesRequest {
 
 export interface GetAllTradesResponse {
     response_type: string;
-    trade_list?: Trade[][];
+    trade_lists?: Trade[][];
     status: "Success" | "Invalid User" | "No Game" | "Invalid Time";
 }
 
