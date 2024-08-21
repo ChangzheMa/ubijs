@@ -82,6 +82,10 @@ class Account {
         return this.stockInfoMap.get(instrumentName)
     }
 
+    public getActiveOrdersByInstrumentName(instrumentName: string): ActiveOrder[] {
+        return this.activeOrders.filter(order => order.instrument_name == instrumentName)
+    }
+
     /**
      * 下单
      * @param instrumentName 股票名
@@ -92,7 +96,7 @@ class Account {
      */
     public async sendOrder(instrumentName: string, price: number, volume: number, localtime: number=0): Promise<boolean> {
         const direction = volume > 0 ? 'buy' : 'sell';
-        const orderResponse: OrderResponse = await api.sendOrder(instrumentName, direction, price, volume, localtime)
+        const orderResponse: OrderResponse = await api.sendOrder(instrumentName, direction, price, Math.abs(volume), localtime)
         if (orderResponse && orderResponse.status == "Success") {
             this.activeOrders.push({
                 instrument_name: instrumentName,
@@ -102,6 +106,8 @@ class Account {
                 direction: direction
             })
             return true
+        } else {
+            logger.error(`sendOrder error: ${JSON.stringify(orderResponse)}`)
         }
         return false
     }

@@ -70,6 +70,10 @@ class Game {
         return this.isInGame
     }
 
+    public getGameLabel(): string | undefined {
+        return this.gameLabel
+    }
+
     private notifyGameStart(gameLabel: string) {
         if (this.gameStatusListener) {
             this.gameStatusListener.onGameStart(gameLabel)

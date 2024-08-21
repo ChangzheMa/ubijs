@@ -1,17 +1,50 @@
 import { game } from './context/game';
 import { exchange } from './context/exchange';
 import { account } from './context/account';
-import { logger, sleep } from './util';
-import { TRADE_TICK_COUNT_PER_DAY, TRADING_CYCLE_TICKS } from './env';
+import { appendToFile, logger, sleep } from './util';
+import { GAME_LOG_FOLDER, TRADE_TICK_COUNT_PER_DAY, TRADING_CYCLE_TICKS } from './env';
 import { getInstrumentNames } from './context/ctxutil';
+import { ActiveOrder, UserStockInfo } from './types';
 
+
+const appendLog = async (logStr: string): Promise<void> => {
+    const folderPath = `${GAME_LOG_FOLDER}/${game.getGameLabel()}`
+    await appendToFile(`${folderPath}/order.log`, logStr)
+}
 
 const tradeForInstrument = async (instrumentName: string) => {
 
 }
 
 const clearForInstrument = async (instrumentName: string) => {
+    const stockInfo: UserStockInfo | undefined = account.getStockInfoByInstrumentName(instrumentName)
+    if (!stockInfo) {
+        return
+    }
 
+    const remainVolume = stockInfo.remain_volume
+    let unfilledVolume = 0
+    account.getActiveOrdersByInstrumentName(instrumentName).forEach((order: ActiveOrder) => {
+        unfilledVolume += order.volume
+    })
+    const orderVolume = remainVolume - unfilledVolume
+    const [ask, bid] = exchange.getBestPriceByInstrumentName(instrumentName)
+
+    let price = 0
+    if (orderVolume > 0 && ask > 0) {   // 买
+        price = ask + 0.02
+    } else if (orderVolume < 0 && bid > 0) {    // 卖
+        price = bid - 0.02
+    }
+    if (Math.abs(orderVolume) > 0 && price > 0) {     // 确实需要交易
+        await account.cancelOrderByInstrument(instrumentName)
+        const localtime = exchange.getLatestLocaltime()
+        account.sendOrder(instrumentName, price, orderVolume, localtime).then(success => {
+            if (success) {
+                appendLog(`${localtime}, SendOrder: ${instrumentName}, ${orderVolume}, ${price}`)
+            }
+        })
+    }
 }
 
 const main = async () => {

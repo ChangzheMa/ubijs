@@ -54,6 +54,18 @@ class Exchange {
         return localtime
     }
 
+    /**
+     * 获取最优价格，没有数据的话会返回 [0, 0]
+     * @param instrumentName
+     */
+    public getBestPriceByInstrumentName(instrumentName: string): number[] {
+        const lob = this.lobMap[instrumentName]
+        if (lob) {
+            return [lob[lob.length-1][1], lob[lob.length-1][21]]
+        }
+        return [0, 0]
+    }
+
     private async fetchDataByInstrumentName(instrumentName: string) {
         let preLocaltime = -1
         while (this.isInGame) {
